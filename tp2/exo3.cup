@@ -1,0 +1,24 @@
+import java_cup.runtime.*;
+import java.lang.*;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		new parser(new Yylex(System.in)).parse();
+	}
+:}
+
+action code{:
+	int nb = 0;
+	int nbplusgrand = 0;
+:}
+
+terminal String BIN;
+non terminal expr, list_nb;
+
+expr ::= list_nb {: System.out.println(" Analyse terminée !\nNombre d'entiers reconnus : "+nb);
+		System.out.println("longueur du nombre le plus long est :"+nbplusgrand); :}
+	| {: System.out.println(" Entree vide !"); :};
+
+list_nb ::= BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length(); System.out.println("BIN : "+n); :} list_nb
+	| BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length();System.out.println("BIN : "+n); :};
+
