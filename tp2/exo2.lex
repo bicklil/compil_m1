@@ -10,6 +10,6 @@ import java_cup.runtime.Symbol;
 binaire = [01]
 
 %%
-{binaire}++ {return new Symbol(sym.BIN, new Integer().parseInt(yytext(),2);}
+{binaire}++ {return new Symbol(sym.BIN, yytext());}
 \n {} 
 . {}

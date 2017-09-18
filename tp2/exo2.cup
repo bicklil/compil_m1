@@ -1,4 +1,5 @@
 import java_cup.runtime.*;
+import java.lang.*;
 
 parser code {:
 	public static void main(String args[]) throws Exception {
@@ -11,13 +12,13 @@ action code{:
 	int nbplusgrand = 0;
 :}
 
-terminal Integer ENTIER;
+terminal String BIN;
 non terminal expr, list_nb;
 
 expr ::= list_nb {: System.out.println(" Analyse terminée !\nNombre d'entiers reconnus : "+nb);
-		System.out.printl("longueur du nombre le plus long est :"+log2(nbplusgrand)) :}
+		System.out.println("longueur du nombre le plus long est :"+nbplusgrand); :}
 	| {: System.out.println(" Entree vide !"); :};
 
-list_nb ::= BIN:n {: nb++; if(n>nbleplusgrand)nbleplusgrand=n; System.out.println("BIN : "+n); :} list_nb
-	| BIN:n {: nb++; if(n>nbleplusgrand)nbleplusgrand=n;System.out.println("BIN : "+n); :};
+list_nb ::= BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length(); System.out.println("BIN : "+n); :} list_nb
+	| BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length();System.out.println("BIN : "+n); :};
 
