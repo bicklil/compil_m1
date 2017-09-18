@@ -8,14 +8,16 @@ parser code {:
 
 action code{:
 	int nb = 0;
+	int nbplusgrand = 0;
 :}
 
 terminal Integer ENTIER;
 non terminal expr, list_nb;
 
-expr ::= list_nb {: System.out.println(" Analyse terminée !\nNombre d'entiers reconnus : "+nb); :}
+expr ::= list_nb {: System.out.println(" Analyse terminée !\nNombre d'entiers reconnus : "+nb);
+		System.out.printl("longueur du nombre le plus long est :"+log2(nbplusgrand)) :}
 	| {: System.out.println(" Entree vide !"); :};
 
-list_nb ::= ENTIER:n {: nb++; System.out.println("ENTIER : "+n); :} list_nb
-	| ENTIER:n {: nb++; System.out.println("ENTIER : "+n); :};
+list_nb ::= BIN:n {: nb++; if(n>nbleplusgrand)nbleplusgrand=n; System.out.println("BIN : "+n); :} list_nb
+	| BIN:n {: nb++; if(n>nbleplusgrand)nbleplusgrand=n;System.out.println("BIN : "+n); :};
 

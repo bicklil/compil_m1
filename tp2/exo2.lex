@@ -7,9 +7,9 @@ import java_cup.runtime.Symbol;
 %line
 %column
 
-chiffre = [0-9]
+binaire = [01]
 
 %%
-{chiffre}++ {return new Symbol(sym.ENTIER, new Integer(yytext()));}
+{binaire}++ {return new Symbol(sym.BIN, new Integer().parseInt(yytext(),2);}
 \n {} 
 . {}
