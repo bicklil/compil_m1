@@ -8,17 +8,18 @@ parser code {:
 :}
 
 action code{:
-	int nb = 0;
-	int nbplusgrand = 0;
+	int total = 0;
 :}
 
-terminal String BIN;
-non terminal expr, list_nb;
+terminal String DPT,FACTURE,FAC, TOTAL, IDEN, PV,NBR;
+non terminal A, B;
 
-expr ::= list_nb {: System.out.println(" Analyse terminée !\nNombre d'entiers reconnus : "+nb);
-		System.out.println("longueur du nombre le plus long est :"+nbplusgrand); :}
-	| {: System.out.println(" Entree vide !"); :};
+A ::= FACTURE FAC DPT B {: System.out.println(" Analyse terminée !");:}
+	| {: System.out.println("facture incorrecte");:}
+	| error:e {List expected = expected_token_ids();
+	mIde.registerParseError(exleft,exright,expected); :} FACTURE;
 
-list_nb ::= BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length(); System.out.println("BIN : "+n); :} list_nb
-	| BIN:n {: nb++; if(n.length()>nbplusgrand)nbplusgrand=n.length();System.out.println("BIN : "+n); :};
+B ::= IDEN NBR:qtt NBR:tarif PV {: total= total + Integer.parseInt(qtt)*Integer.parseInt(tarif);:} B 
+	| TOTAL NBR:tt {: if (total != Integer.parseInt(tt)) System.out.println("total incorrect");
+			  else System.out.println("total correct");:};
 
