@@ -15,9 +15,7 @@ terminal String DPT,FACTURE,FAC, TOTAL, IDEN, PV,NBR;
 non terminal A, B;
 
 A ::= FACTURE FAC DPT B {: System.out.println(" Analyse terminée !");:}
-	| {: System.out.println("facture incorrecte");:}
-	| error:e {List expected = expected_token_ids();
-	mIde.registerParseError(exleft,exright,expected); :} FACTURE;
+	| {: System.out.println("facture incorrecte");:};
 
 B ::= IDEN NBR:qtt NBR:tarif PV {: total= total + Integer.parseInt(qtt)*Integer.parseInt(tarif);:} B 
 	| TOTAL NBR:tt {: if (total != Integer.parseInt(tt)) System.out.println("total incorrect");
