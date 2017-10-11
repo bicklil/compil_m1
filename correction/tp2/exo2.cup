@@ -1,0 +1,39 @@
+// fichier de specif cup
+
+
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+  int nb=0;
+  int lg=0;
+  int l;
+:}
+
+terminal String BINAIRE;
+non terminal expr, list_nb;
+
+expr ::= list_nb {: System.out.println(" Analyse terminee !");
+                    System.out.println( nb + " binaires reconnus"); 
+                    System.out.println( "plus grande longueur : " + lg); :}
+      |  {: System.out.println("Entree vide ?!? "); :} 
+	  ;
+
+list_nb ::= BINAIRE:n {: l=n.length();
+                         if (l>lg) lg=l;
+                         nb++; 
+						 System.out.println(" BINAIRE : " + n); :}   
+			list_nb
+         | BINAIRE:n {: l=n.length();
+                        if (l>lg) lg=l;
+                        nb++; 
+						System.out.println(" BINAIRE : " + n); :}
+    	;
+
+
