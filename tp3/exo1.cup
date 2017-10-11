@@ -1,0 +1,17 @@
+import java_cup.runtime.*;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		new parser (new Yylex(System.in)).parse();
+	}
+:}
+
+action code {:
+
+:}
+
+terminal Double REEL
+terminal Integer ENTIER
+terminal MOTCLE, TYPE, OP_ARITH, OP_LOG, OP_REL, AFFECT, COMMENT
+terminal String CHAINE 
+non terminal
