@@ -1,0 +1,35 @@
+import java_cup.runtime.*;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		new parser (new Yylex(System.in)).parse();
+	}
+:}
+
+action code{:
+
+:}
+
+terminal Double nb;
+terminal plus;
+terminal moins;
+terminal fois;
+terminal divise;
+terminal paro;
+terminal parf;
+
+non terminal Double E;
+non terminal S;
+
+precedence left plus,moins;
+precedence left fois,divise;
+
+S ::= E:e1 {: System.out.println(e1); :};
+
+E ::= E:e1 plus E:e2{: RESULT=e1 + e2; :}
+    | E:e1 moins E:e2{: RESULT=e1-e2; :}
+    | E:e1 fois E:e2{: RESULT=e1*e2; :}
+    | E:e1 divise E:e2{: RESULT=e1/e2; :}
+    | paro E:e1 parf {:RESULT = e1; :}
+    | nb:e1 {:RESULT= e1 ; :};
+

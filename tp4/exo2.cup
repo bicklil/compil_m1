@@ -1,0 +1,80 @@
+import java_cup.runtime.*;
+
+import java.util.HashMap;
+
+parser code {:
+	public static void main(String args[]) throws Exception {
+		new parser (new Yylex(System.in)).parse();
+	}
+:}
+
+action code{:
+	HashMap<String,Object[]> tableSym = new HashMap<?,?>();
+	String typ;
+
+	void ajoutSym(String id, String typ){
+		if (tableSym.contaionsKey(id){
+			System.out.println(id +" deja enrengistre");
+		}
+		else{
+			Object[] temp = new Object[2];
+			temp[0] = typ;
+			temp[1] = null;
+		
+			tableSym.put(id,temp);
+		}
+	}
+	
+	void affectVal(String id, String typ, Object val){
+		if (tableSym.containsKey(id)){
+			Object[] temp = tableSym.get(id);
+			if (temp[0].equals(typ)){
+				temp[1] = val;
+				tableSym.put(id,temp);
+			}
+			else{
+				System.out.println(id + " " + typ + " " + temp[0] + " ne corresepond pas");
+			}
+		}
+		else{
+			System.out.println(id +"n'est pas enrengistre dans la base");
+		}
+	}
+:}
+
+terminal String TYPE;
+terminal Integer ENTIER;
+terminal Double REEL;
+terminal String OP_ARITHM;
+terminal String OP_LOG;
+terminal String OP_REL;
+terminal String SEP;
+terminal String IDENT;
+terminal String CHAINE;
+terminal AFFECT
+
+non terminal prog;
+non terminal decs;
+non terminal decla;
+non terminal liste;
+non terminal affects;
+non terminal affect;
+non terminal Object expr;
+
+prog 	::= decs affects 	{:System.out.println(tableSym); :};
+decs 	::= decla decs;
+decla 	::= TYPE:t liste SEP	{: type = t; :};
+liste 	::= IDENT:id		{: ajoutSym(id,typ); :}
+	|   liste SEP IDENT:id; {: ajoutSym(id,typ); :}
+affects	::= affect affects;
+affect	::= IDENT:id AFFECT expr:obj {: if( obj instanceof String){
+						if(typ.equals(String)){
+							affectVal(id,typ,obj);
+						}
+						else{
+							
+						}
+					affectVal(id,typ,obj); :};
+expr	::= IDENT:t 	{: typ=getType(t);:}
+	|   REEL:t 	{: typ= "int"; :}
+	|   ENTIER:t  	{: typ= "Double"; :};
