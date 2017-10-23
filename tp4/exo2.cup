@@ -12,8 +12,27 @@ action code{:
 	HashMap<String,Object[]> tableSym = new HashMap<?,?>();
 	String typ;
 
+	String getType(String id){
+		if (tableSym.containsKey(id){
+			return tableSym.get(id)[0];
+		}
+		else{
+			return "String";
+		}
+	}
+
+	Object GetVal(String id){
+		if (tableSym.containsKey(id){
+			return tableSym.get(id)[1];
+		}
+		else{
+			System.out.println("erreur il y a pas de valeur pour : "+id);
+			return null;
+		}
+	}
+
 	void ajoutSym(String id, String typ){
-		if (tableSym.contaionsKey(id){
+		if (tableSym.containsKey(id){
 			System.out.println(id +" deja enrengistre");
 		}
 		else{
@@ -72,9 +91,9 @@ affect	::= IDENT:id AFFECT expr:obj {: if( obj instanceof String){
 							affectVal(id,typ,obj);
 						}
 						else{
-							
+							affectVal(id,typ,getVal(obj));
 						}
 					affectVal(id,typ,obj); :};
-expr	::= IDENT:t 	{: typ=getType(t);:}
-	|   REEL:t 	{: typ= "int"; :}
-	|   ENTIER:t  	{: typ= "Double"; :};
+expr	::= IDENT:t 	{: RETURN t;typ= getType(t);:}
+	|   REEL:t 	{: RETURN t;typ= "int"; :}
+	|   ENTIER:t  	{: RETURN t;typ= "Double"; :};

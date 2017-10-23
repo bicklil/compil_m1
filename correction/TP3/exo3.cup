@@ -1,0 +1,31 @@
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+ 
+:}
+
+terminal IDENT, TYPE, VIRG, PVIRG;
+non terminal prog, listedecla, decla, listeid;
+
+prog ::= listedecla {: System.out.println(" Programme correct !"); :}
+      ;
+
+listedecla ::= listedecla decla {: System.out.println("Déclaration ok" ); :} PVIRG 
+         | decla PVIRG {: System.out.println("Déclaration ok" ); :} 
+         | error PVIRG {: System.out.println("J'ai rien compris ...  " ); :}
+         ;
+
+decla ::= TYPE listeid ;
+ 
+listeid ::= IDENT VIRG listeid
+         | IDENT
+         ;
+
+

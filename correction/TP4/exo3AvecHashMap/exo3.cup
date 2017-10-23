@@ -1,0 +1,190 @@
+
+import java_cup.runtime.*;
+import java.util.HashMap;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+
+   int ty;
+
+   // les types que l'on peut mettre dans la table
+   public static int entier = 1;
+   public static int reel = 2;
+   public static int car = 3;
+
+   public HashMap<String,Object[]> tab = new HashMap<String,Object[]> ();
+
+   public void affSymbole(String s) {
+       Object [] obj = tab.get(s);
+       System.out.println( s + " est de valeur " + obj[0] + " et de type " + obj[1] );
+   }
+
+   public void AfficheTable() {
+       System.out.println("La table contient " + tab.size() + " variables");
+       for (String i : tab.keySet()) 
+           affSymbole(i);
+   }
+
+
+   int type_expr,type_expr2;
+
+   String tradtype(int untype) {
+     switch (untype) {
+        case 1 : { return "entier"; }
+        case 2 : { return "reel";}
+        case 3 : { return "caractere";}
+     }
+    return "heu...";
+   }
+
+:}
+
+terminal String IDENT;
+terminal Integer ENTIER;
+terminal Double REEL;
+terminal TYPEINT, TYPEFLOAT, TYPECAR, VIRG, PTVIRG, AFF, POUV, PFERM, ACOUV, ACFERM, IF, ELSE, OPREL, FOR, MAIN;
+terminal PLUS, MOINS, DIV, MULT;
+non terminal Double expression;
+non terminal prog,  decla, listeid, listeinstr, instr, bloc, condition, affectation, instruction_if, suite, programme;
+
+precedence left PLUS, MOINS;
+precedence left DIV, MULT;
+
+// ===== GRAMMAIRE
+
+programme ::= MAIN POUV PFERM ACOUV prog ACFERM {: System.out.println("Programme correct !"); AfficheTable(); :}
+            ;
+
+prog ::= decla prog
+      | instr prog
+      |
+      	;
+
+
+decla ::= TYPEINT {: ty=entier; :} listeid 
+        | TYPEFLOAT {: ty=reel; :} listeid 
+        | TYPECAR {: ty=car; :} listeid 
+      ;
+ 
+listeid ::= IDENT:id {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=null;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :}  
+            VIRG listeid
+          | IDENT:id  {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=null;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :}  
+            PTVIRG
+         | IDENT:id AFF ENTIER:e  VIRG 
+                        {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=(Object)e;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :} 
+           listeid
+        | IDENT:id AFF REEL:r  VIRG 
+                       {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=(Object)r;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :} 
+          listeid
+        | IDENT:id AFF ENTIER:e 
+                      {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=(Object)e;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :} 
+          PTVIRG 
+        | IDENT:id AFF REEL:r 
+                      {: if (tab.containsKey(id)) 
+                               System.out.println("La variable " + id + " existe deja !"); 
+                        else {
+                            Object [] o= new Object[2];
+                            o[0]=(Object)r;
+                            o[1]=(Object)ty;
+                            tab.put(id,o);
+                        } :}  
+          PTVIRG 
+         ;
+
+expression ::= ENTIER:e {: type_expr=entier; RESULT = 1.0*e; :}
+           | IDENT:i {: if (!tab.containsKey(i)) 
+                          {System.out.println("Variable " + i + " non declaree");
+                           type_expr=reel;
+                           RESULT=0.0;} 
+                        else {
+                          Object o[]=tab.get(i);
+                          if (o[0]==null) {
+                              System.out.println("Variable " + i + " non initialisee");
+                              type_expr=(Integer)o[1];
+                              RESULT=0.0;}    
+                          else
+                             {type_expr=(Integer)o[1];
+                              if (type_expr==entier) RESULT = 1.0*((Integer)o[0]);
+                              else RESULT = (Double)o[0];}
+                        } :}
+           | REEL:r {: type_expr=reel; RESULT = r; :}
+           ;
+
+listeinstr ::= instr listeinstr
+            | ; 
+
+instr ::= affectation PTVIRG
+        | instruction_if
+      ;
+
+affectation ::= IDENT:id AFF expression:e 
+               {: if (!tab.containsKey(id)) System.out.println("Variable " + id + " non declaree"); 
+                  else {
+                          Object o[]=tab.get(id);
+                          if (((Integer)o[1])!=type_expr) 
+                              System.out.println("Erreur types, impossible d'affecter un " + tradtype(type_expr) + " dans " + id + " qui est un " + tradtype((Integer)o[1]));  
+                          else
+                             {Object [] nouv= new Object[2];
+                              nouv[0]=e;
+                              nouv[1]=o[1];
+                              tab.put(id,nouv); }
+                      } :}
+           ;
+
+instruction_if ::= IF POUV condition PFERM bloc suite
+                          ;
+
+suite ::= ELSE bloc
+       |
+       ;
+
+bloc ::= instr 
+     | ACOUV listeinstr ACFERM
+     ;
+
+condition ::= expression OPREL expression
+           ;
+
+
+
+

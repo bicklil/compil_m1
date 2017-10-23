@@ -1,0 +1,37 @@
+// fichier de specif cup
+
+
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new jflex(System.in)).parse();
+   }
+:}
+
+action code {:
+
+:}
+
+terminal PARO , PARF , ENTIER , IDENT;
+non terminal expr, prog, liste, listeprog;
+
+expr ::= prog  {: System.out.println("Programme CORRECT !"); :}
+      |  {: System.out.println("Entree vide ?!? "); :} 
+      ;
+
+
+prog ::= PARO PARF
+      | ENTIER
+      | IDENT
+      | PARO listeprog PARF
+      ;
+
+listeprog ::= prog listeprog
+      | prog
+      ;
+
+
+
+

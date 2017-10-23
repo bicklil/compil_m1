@@ -1,0 +1,21 @@
+int main(){
+
+int i=3,j;
+
+j=5;
+float a;
+if (10>2)
+   a=12.3;
+else {
+   a= i;
+   j=i;
+}
+float b = 12.3;
+
+
+a=3;
+c=k;
+int k;
+i=k;
+
+}

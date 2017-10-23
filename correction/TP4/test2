@@ -1,0 +1,23 @@
+int main(){
+
+int i=3,j;
+
+j=5*i+(3-2);
+float a;
+if (i<j)
+   a=12.3 - 5*j;
+else {
+   a= i/j;
+   j=i;
+}
+float b = 12.3;
+
+for (i=1;i<10;i=i+1)
+   j=j+3;
+
+a=3;
+c=k;
+int k;
+i=k;
+
+}

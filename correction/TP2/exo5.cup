@@ -1,0 +1,34 @@
+// fichier de specif cup
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+int n=0;   // niveau courant
+int max=0; // niveau maximum
+:}
+
+terminal PARO , PARF , ENTIER , IDENT;
+non terminal expr, prog, liste;
+
+expr ::= prog  {: System.out.println("Programme CORRECT ! niveau : " + max); :}
+      ;
+
+
+prog ::= liste PARO {: n++; if (n> max) max=n; :} prog PARF {: n--; :} prog
+      | liste
+      ;
+
+liste ::= ENTIER liste
+      | IDENT liste
+      |
+      ;
+
+
+
+

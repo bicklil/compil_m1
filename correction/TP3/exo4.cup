@@ -1,0 +1,61 @@
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+ 
+:}
+
+terminal IDENT, TYPE, VIRG, PTVIRG, AFF, ENTIER, REEL, POUV, PFERM, ACOUV, ACFERM, IF, ELSE, OPREL;
+non terminal prog, listedecla, decla, listeid, expression, listeinstr, instr, bloc, condition, affectation, instruction_if, suite;
+
+prog ::= listedecla listeinstr {: System.out.println("Programme correct !"); :}
+	;
+
+listedecla ::= decla PTVIRG listedecla 
+         | 
+         ;
+
+decla ::= TYPE listeid ;
+ 
+listeid ::= IDENT VIRG listeid
+        | IDENT
+        | IDENT AFF expression VIRG listeid
+        | IDENT AFF expression
+         ;
+
+expression ::= ENTIER
+           | IDENT
+           | REEL ;
+
+listeinstr ::= instr listeinstr
+            | ;
+
+instr ::= affectation PTVIRG
+        | instruction_if
+      ;
+
+affectation ::= IDENT AFF expression
+       ;
+
+instruction_if ::= IF POUV condition PFERM bloc suite
+                          ;
+
+suite ::= ELSE bloc
+       |
+       ;
+
+bloc ::= instr 
+     | ACOUV listeinstr ACFERM
+     ;
+
+condition ::= expression OPREL expression
+           ;
+
+
+

@@ -1,0 +1,222 @@
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+
+   int ty;
+
+   // les types que l'on peut mettre dans la table
+   public static int entier = 1;
+   public static int reel = 2;
+   public static int car = 3;
+
+public class tabsymb{
+
+ public class symbole{
+  
+   // les champs
+   public String nom;
+   public boolean init;  // la var a été initialisée ou non
+   public int sontype;   // type de la variable
+   public Object valeur; // sa valeur
+   //public float valeur;
+   // les méthodes
+   public void AffSymb() {
+      if (init)
+          System.out.println("variable " + nom + " de type " + sontype + " et de valeur " + valeur);
+      else
+          System.out.println("variable " + nom + " de type " + sontype );
+   }
+   public symbole(String s,boolean b, int i, Object o) {
+       nom=s;
+       init=b;
+       sontype=i;
+       valeur=o;
+   }
+   public Object getValeur() {
+      return valeur;
+   }
+   public String getNom() {
+      return nom;
+   }
+   public boolean getInit() {
+      return init;
+   }
+   public int getType() {
+      return sontype;
+   }
+   public void setValeur(Object o) {
+      valeur=o;
+   }
+   public void setInit(boolean b) {
+      init=b;
+   }
+ }
+ public symbole[] tab ;
+ public int nb;
+
+ // les constructeurs et méthodes
+ public tabsymb(int taille) {
+   tab=new symbole[taille];
+   nb=0;
+ }
+
+ public void Affiche() {
+  int i=0;
+  System.out.println("la table contient " + nb + " variables");
+  for (i=0;i<nb;i++)
+    tab[i].AffSymb();
+ }
+
+ public void Ajout(String s, boolean b, int t, float v) {
+    tab[nb]=new symbole(s,b,t,v);
+    nb++;
+ }
+
+ public int Recherche(String s) {
+    int i=0;
+    while (i<nb && !s.equals(tab[i].getNom())) {i++;}
+    if (i>=nb) {return -1;}
+    else {return i;}
+ }
+
+ public Object getValeur(int p) {
+  return tab[p].getValeur();
+ }
+
+ public boolean getInit(int p) {
+   return tab[p].getInit();
+ }
+
+ public int getType(int p) {
+   return tab[p].getType();
+ }
+
+ public void setValeur(int p, Object o) {
+  tab[p].setValeur(o);
+ }
+
+
+
+ public void setInit(int p, boolean b) {
+  tab[p].setInit(b);
+ }
+
+
+}
+
+tabsymb table= new tabsymb(50);
+int type_expr,type_expr2;
+
+String tradtype(int untype) {
+  switch (untype) {
+     case 1 : { return "entier"; }
+     case 2 : { return "reel";}
+     case 3 : { return "caractere";}
+  }
+  return "heu...";
+}
+
+:}
+
+terminal String IDENT;
+terminal Integer ENTIER;
+terminal Float REEL;
+terminal TYPEINT, TYPEFLOAT, TYPECAR, VIRG, PTVIRG, AFF, POUV, PFERM, ACOUV, ACFERM, IF, ELSE, OPREL, FOR, MAIN;
+terminal PLUS, MOINS, DIV, MULT;
+non terminal Float expression;
+non terminal prog,  decla, listeid, listeinstr, instr, bloc, condition, affectation, instruction_if, suite, instruction_for, programme;
+
+precedence left PLUS, MOINS;
+precedence left DIV, MULT;
+
+// ===== GRAMMAIRE
+
+programme ::= MAIN POUV PFERM ACOUV prog ACFERM {: System.out.println("Programme correct !"); table.Affiche(); :}
+            ;
+
+prog ::= decla prog
+      | instr prog
+      |
+      	;
+
+
+decla ::= TYPEINT {: ty=entier; :} listeid 
+       | TYPEFLOAT {: ty=reel; :} listeid 
+       | TYPECAR {: ty=car; :} listeid 
+      ;
+ 
+listeid ::= IDENT:id {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,false,ty,0); :}  VIRG listeid
+        | IDENT:id  {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,false,ty,0); :} PTVIRG
+        | IDENT:id AFF ENTIER:e  VIRG {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,true,ty,e); :}  listeid
+        | IDENT:id AFF REEL:r  VIRG {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,true,ty,r); :}  listeid
+        | IDENT:id AFF ENTIER:e {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,true,ty,e); :}  PTVIRG 
+        | IDENT:id AFF REEL:r {: if (table.Recherche(id)!=-1) System.out.println("La variable " + id + " existe deja !"); else table.Ajout(id,true,ty,r); :}  PTVIRG 
+         ;
+
+expression ::= expression:e1 PLUS expression:e2 {: RESULT = e1+e2; :}
+           | expression:e1 MOINS expression:e2 {: RESULT = e1-e2; :}
+           | expression:e1 DIV expression:e2 {: RESULT = e1/e2; :}
+           | expression:e1 MULT expression:e2 {: RESULT = e1*e2; :}
+           | POUV expression:e PFERM {: RESULT = e; :}
+           | ENTIER:e {: type_expr=entier; RESULT = (float)e; :}
+           | IDENT:i {: int p=table.Recherche(i); 
+                        if (p==-1) {System.out.println("Variable " + i + " non declaree");type_expr=reel;RESULT=(float)0.0;} 
+                        else 
+                          if (!table.getInit(p)) {
+                            System.out.println("Variable " + i + " non initialisee");type_expr=table.getType(p);RESULT=(float)0.0;}    
+                          else
+                            {type_expr=table.getType(p);RESULT = (float)table.getValeur(p);} :}
+           | REEL:r {: type_expr=reel; RESULT = r; :}
+           ;
+
+listeinstr ::= instr listeinstr
+            | ; 
+
+instr ::= affectation PTVIRG
+        | instruction_if
+        | instruction_for
+      ;
+
+affectation ::= IDENT:id AFF expression:e {: int p=table.Recherche(id); 
+                                             if (p==-1) System.out.println("Variable " + id + " non declaree"); 
+                                             else {
+                                                 if (type_expr!=table.getType(p))
+                                                      System.out.println("Erreur types, impossible d'affecter un " + tradtype(type_expr) + " dans " + id + " qui est un " + tradtype(table.getType(p))); 
+                                                 else {table.setValeur(p,e);table.setInit(p,true);} 
+                                              }
+                                          :}
+       ;
+
+instruction_if ::= IF POUV condition PFERM bloc suite
+                          ;
+
+suite ::= ELSE bloc
+       |
+       ;
+
+bloc ::= instr 
+     | ACOUV listeinstr ACFERM
+     ;
+
+condition ::= expression OPREL expression
+           ;
+
+instruction_for ::= FOR POUV IDENT:id AFF expression:e {: int p=table.Recherche(id); 
+                                             if (p==-1) System.out.println("Variable " + id + " non declaree"); 
+                                             else {
+                                                 if (type_expr!=table.getType(p))
+                                                      System.out.println("Erreur types, impossible d'affecter un " + tradtype(type_expr) + " dans un " + tradtype(table.getType(p))); 
+                                                 else {table.setValeur(p,e);table.setInit(p,true);} 
+                                              }
+                                          :}  PTVIRG condition PTVIRG affectation PFERM bloc
+              ;
+
+
+

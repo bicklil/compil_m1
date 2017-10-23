@@ -1,0 +1,22 @@
+int a2, fez7re ;
+double d;
+int x=12,a;
+if (x==2)
+   a=12;
+else {
+   a=13;
+   b=2.4;
+   if (a<1) 
+      f=2; 
+   d=3;
+}
+a=78;
+
+
+
+
+
+
+
+
+

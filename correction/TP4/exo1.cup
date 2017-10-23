@@ -1,0 +1,30 @@
+
+import java_cup.runtime.*;
+
+parser code {:
+   public static void main(String args[]) throws Exception {
+      new parser(new Yylex(System.in)).parse();
+   }
+:}
+
+action code {:
+ 
+:}
+
+terminal Float NB;
+terminal PLUS, MOINS, DIV, MULT, EOL, POUV, PFERM;
+non terminal prog;
+non terminal Float expression;
+
+prog ::= expression:e {: System.out.println("Résultat : " + e); :} EOL prog
+       | {: System.out.println("Au revoir !"); :}
+	;
+
+expression ::= expression:e1 PLUS expression:e2 {: RESULT = e1+e2; :}
+           | expression:e1 MOINS expression:e2 {: RESULT = e1-e2; :}
+           | expression:e1 DIV expression:e2 {: RESULT = e1/e2; :}
+           | expression:e1 MULT expression:e2 {: RESULT = e1*e2; :}
+           | POUV expression:e1 PFERM {: RESULT = e1; :}
+           | NB:e {: RESULT = e; :}
+           ;
+
