@@ -1,0 +1,76 @@
+import java_cup.runtime.*;
+import java.util.HashMap;
+
+parser code {:
+	public static void main(String args[]) throws Exception{
+			new parser(new Yylex(System.in)).parse();
+	}
+:}
+
+action code {:
+	public class TabSym{
+		HashMap<String,Boolean> tab;
+
+		public TabSym(){
+			tab = new HashMap<String,Boolean>();
+		}
+
+		public TabSym add(String s,Boolean b){
+			tab.put(s,b);
+			return this;
+		}
+
+		public Boolean getBool(String s){
+			return tab.get(s);
+		}
+
+		@Override
+		public String toString(){
+			String res = new String();
+			res = res + "==> les valeurs des variables sont :\n";
+			for(String key : tab.keySet()){
+				res = res + key + " vaut " + tab.get(key) + "\n";
+			}
+			return res;
+		}
+	}
+
+	TabSym tabSym = new TabSym();
+
+:}
+
+terminal		TRUE;
+terminal		FALSE;
+terminal		AND;
+terminal		OR;
+terminal		NOT;
+terminal		PRINT;
+terminal		PARO;
+terminal		PARF;
+terminal String	IDENT;
+terminal 		NL;
+terminal 		EQ;
+
+non terminal Boolean	logique;
+non terminal 			affect;
+non terminal 			prog;
+
+precedence left AND,OR;
+
+prog 	::= logique:l {: System.out.println("==> " +l);:}NL prog
+		| affect NL prog
+		|PRINT {: System.out.print(tabSym.toString());:}NL prog
+		|NL
+		|{:System.out.println("==> Au revoir");:};
+
+affect	::= IDENT:id EQ logique:l {: tabSym.add(id,l);
+									System.out.println("==> "+id+" vaut "+l);:};
+
+logique ::= logique:l1 AND logique:l2 {: RESULT = ( l1 & l2);:}
+		| logique:l1 OR logique:l2 {:RESULT = (l1 | l2);:}
+		| PARO logique:l PARF {:RESULT = l;:}
+		| TRUE{: RESULT = true;:}
+		| FALSE{:RESULT = false;:}
+		| NOT logique:l {:RESULT = !l;:}
+		| IDENT:i {: RESULT = tabSym.getBool(i) ;:};
+
