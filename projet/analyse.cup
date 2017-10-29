@@ -21,7 +21,14 @@ action code {:
 		}
 
 		public Boolean getBool(String s){
-			return tab.get(s);
+			if ( tab.containsKey(s) )
+				if ( tab.get(s) == null)
+					System.out.println(s+" n'est pas initialise");
+				return tab.get(s);
+			else {
+				System.out.println(s+" n'existe pas");
+				return null;
+			}
 		}
 
 		@Override
@@ -60,7 +67,8 @@ precedence left AND,OR;
 prog 	::= logique:l {: System.out.println("==> " +l);:}NL prog
 		| affect NL prog
 		|PRINT {: System.out.print(tabSym.toString());:}NL prog
-		|NL
+		|NL prog
+		|error:e NL prog
 		|{:System.out.println("==> Au revoir");:};
 
 affect	::= IDENT:id EQ logique:l {: tabSym.add(id,l);
