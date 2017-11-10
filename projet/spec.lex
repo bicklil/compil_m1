@@ -14,8 +14,8 @@ ident = [a-zA-Z_][a-zA-Z0-9_]*
 
 %%
 
-vrai {return new Symbol(sym.TRUE);}
-faux {return new Symbol(sym.FALSE);}
+vrai|true {return new Symbol(sym.TRUE);}
+faux|false {return new Symbol(sym.FALSE);}
 et {return new Symbol(sym.AND);}
 ou {return new Symbol(sym.OR);}
 non {return new Symbol(sym.NOT);}

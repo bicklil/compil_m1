@@ -1,4 +1,5 @@
 import java_cup.runtime.*;
+import java.util.List;
 import java.util.HashMap;
 
 parser code {:
@@ -57,20 +58,32 @@ non terminal 			prog;
 
 precedence left AND,OR;
 
-prog 	::= logique:l {: System.out.println("==> " +l);:}NL prog
+prog 	::= logique:l {: if(l == null) System.out.println("==> operation non effectue");
+			else 
+			System.out.println("==> " +l);:}NL prog
 		| affect NL prog
 		|PRINT {: System.out.print(tabSym.toString());:}NL prog
-		|NL
+		|NL prog
+		|error NL prog
 		|{:System.out.println("==> Au revoir");:};
 
-affect	::= IDENT:id EQ logique:l {: tabSym.add(id,l);
-									System.out.println("==> "+id+" vaut "+l);:};
+affect	::= IDENT:id EQ logique:l {: 	if (l != null) {tabSym.add(id,l);
+					
+					System.out.println("==> "+id+" vaut "+l);}
+					else
+					System.out.println("==> valeur non initialisee");:};
 
-logique ::= logique:l1 AND logique:l2 {: RESULT = ( l1 & l2);:}
-		| logique:l1 OR logique:l2 {:RESULT = (l1 | l2);:}
+logique ::= logique:l1 AND logique:l2 {: if((l1 == null) | (l2 == null)) RESULT = null;
+					else
+					RESULT = ( l1 & l2);:}
+		| logique:l1 OR logique:l2 {:if((l1 == null) | (l2 == null)) RESULT = null;
+						else
+						RESULT = (l1 | l2);:}
 		| PARO logique:l PARF {:RESULT = l;:}
 		| TRUE{: RESULT = true;:}
 		| FALSE{:RESULT = false;:}
 		| NOT logique:l {:RESULT = !l;:}
-		| IDENT:i {: RESULT = tabSym.getBool(i) ;:};
+		| IDENT:i {: RESULT = tabSym.getBool(i) ;
+				if (tabSym.getBool(i) == null)
+				System.out.println("==> valeur de "+i+" n'existe pas");:};
 
